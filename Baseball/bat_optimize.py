@@ -31,11 +31,6 @@ TRESULT=9
 BNAME=9
 BRESULT=9
 
-#aikkyu=np.zeros((RA,CA))
-#bonedaseki=np.zeros((RB,CB))
-#cogpitch=np.zeros((RC,CC))
-#dogbat=np.zeros((RD,CD))
-#team=np.zeros((RE,CE))
 omote=np.zeros((TNAME,TRESULT))
 ura=np.zeros((BNAME,BRESULT))
 table=np.ones((I,T,W,S,R1,R2,R3,B1,B2)) * UNCHECK
