@@ -51,9 +51,6 @@ orix_bat_url = "https://baseballdata.jp/11/ctop.html"
 softbank_bat_url = "https://baseballdata.jp/12/ctop.html"
 eagles_bat_url = "https://baseballdata.jp/376/ctop.html"
 
-# reproduce the paper by kira, inakawa
-# r1: 0 .. 8 means batting order and 9 assumes that there's not a runner on the first base.
-
 def data_generate(URL):
     html = urllib.request.urlopen(URL)
 
@@ -61,9 +58,7 @@ def data_generate(URL):
     soup = BeautifulSoup(html, "html.parser")
 
     all_row = soup.tbody.findAll("tr")
-    #for i in range(len(row)):
-    #    print("count: {} {}".format(i , row[i].getText()))
-    row_tmp = all_row[0].getText().replace("\r", "").replace(" ", "").split("\n") #all_row[0]で題名のところを取ってくる
+    row_tmp = all_row[0].getText().replace("\r", "").replace(" ", "").split("\n")
     row = [a for a in row_tmp if a != '']
     print("contents, length: {} {}".format(row, len(row)))
 
@@ -77,7 +72,6 @@ def data_generate(URL):
     for i in range(int(len(tmp)/39)):
         ind_data = pd.DataFrame([tmp[39*i:39*i+39]], columns=row)
         df = pd.concat([df, ind_data], axis=0)
-    #print("count: {} {}".format(i , data[i].getText()))
 
     team = df.iloc[0]["球団"]
     print(team)
@@ -106,33 +100,33 @@ def data_generate(URL):
 
     # 各選手について 凡退,単打率 二塁打率 三塁打率 本塁打率 四死球率 盗塁成功率 犠打成功率　併殺打率を計算する
     cal_list = ["選手名", "凡退率", "単打率", "2塁打率", "3塁打率", "本塁打率", "四死球率", "盗塁成功率", "犠打成功率", "併殺打率"]
-    df["単打率"] = df["単打"] / df["打席数"]
-    df["2塁打率"] = df["2塁打"] / df["打席数"]
-    df["3塁打率"] = df["3塁打"] / df["打席数"]
-    df["本塁打率"] = df["本塁打"] / df["打席数"]
-    df["四死球率"] = (df["四球"] + df["死球"]) / df["打席数"]
-    df["併殺打率"] = df["併殺"] / df["打席数"]
-    df["凡退率"] = (df["打席数"] - df["安打数"] - df["犠打"] - df["犠飛"] - df["失策"] -df["四球"] - df["死球"]) / df["打席数"]
+    df["単打率"] = df["単打"] / (df["打席数"] - df["犠打"])
+    df["2塁打率"] = df["2塁打"] / (df["打席数"] - df["犠打"])
+    df["3塁打率"] = df["3塁打"] / (df["打席数"] - df["犠打"])
+    df["本塁打率"] = df["本塁打"] / (df["打席数"] - df["犠打"])
+    df["四死球率"] = (df["四球"] + df["死球"]) / (df["打席数"] - df["犠打"])
+    df["併殺打率"] = df["併殺"] / (df["打席数"] - df["犠打"])
+    df["凡退率"] = 1 - df["出塁率"]
 
     # 計算に使用する変数だけ抽出
     calc_df = df[cal_list]
     return calc_df
 
 # -----------------------
-# inning, top-bottom, out count, point diff, runners, batting order,
+# イニング, 表裏, アウトカウント, 点差, 一塁走者, 二塁走者, 三塁走者, 打順, 先攻チーム選手の攻撃力、後攻チーム選手の攻撃力
 # インデックスにマイナスをつけられないので、35点を同点とし、それ以上が先行リード、それ以下が後攻リードとした。
 def calc(i, t, w, s, r1, r2, r3, b1, b2, omote, ura):
     b1 = b1 % 9
     b2 = b2 % 9
-    t = t % 2     #/*0,1,0,1*/
+    t = t % 2
     if w > 3:
         w = 3
-    # a: considers double plays
-    # b: considers stolen base
-    # c: considers bants
-    # d: not considers doube plays
-    # e: intentional BB
-    # f: considers double plats and no scoring
+    # a: 併殺打
+    # b: 盗塁
+    # c: 犠打
+    # d: 犠打なし
+    # e: 敬遠
+    # f: 併殺打で0点
 
     if table[i][t][w][s][r1][r2][r3][b1][b2] != UNCHECK:
         return table[i][t][w][s][r1][r2][r3][b1][b2]
@@ -713,9 +707,8 @@ if __name__ == "__main__":
 
     print("----------calculations start-------------")
     start = time.time()
-    print("visitor win %:{}" .format(calc(8, 0, 0, 33, 9, 0, 0, 0, 0, omote, ura)))
-    print("home win %:{}" .format(bcalc(8, 0, 0, 33, 9, 0, 0, 0, 0, omote, ura)))
-    # inning, top-bottom, out-count, point diff, runner1, runner2, tunner3, order1, order2
+    print("visitor win %:{:.3f}" .format(calc(0, 0, 0, 35, 9, 0, 0, 0, 0, omote, ura)))
+    #print("home win %:{}" .format(bcalc(8, 0, 0, 33, 9, 0, 0, 0, 0, omote, ura)))
     end = time.time()
     print("calculation time:", end-start)
     print("Finish")
