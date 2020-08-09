@@ -17,7 +17,7 @@ lions_url = "https://baseballdata.jp/7/ctop.html"
 fighters_url = "https://baseballdata.jp/8/ctop.html"
 lotte_url = "https://baseballdata.jp/9/ctop.html"
 orix_url = "https://baseballdata.jp/11/ctop.html"
-softbank_url = "https://baseballdata.jp/12/ctop.html"
+hawks_url = "https://baseballdata.jp/12/ctop.html"
 eagles_url = "https://baseballdata.jp/376/ctop.html"
 
 def data_generate(URL):
@@ -68,44 +68,51 @@ def data_generate(URL):
     
     # 各選手について 凡退,単打率 二塁打率 三塁打率 本塁打率 四死球率 盗塁成功率 犠打成功率　併殺打率を計算する
     df["単打率"] = df["単打"] / (df["打席数"] - df["犠打"])
-    df["2塁打率"] = df["2塁打"] / (df["打席数"] - df["犠打"])
-    df["3塁打率"] = df["3塁打"] / (df["打席数"] - df["犠打"])
+    df["二塁打率"] = df["2塁打"] / (df["打席数"] - df["犠打"])
+    df["三塁打率"] = df["3塁打"] / (df["打席数"] - df["犠打"])
     df["本塁打率"] = df["本塁打"] / (df["打席数"] - df["犠打"])
     df["四死球率"] = (df["四球"] + df["死球"]) / (df["打席数"] - df["犠打"])
     df["併殺打率"] = df["併殺"] / (df["打席数"] - df["犠打"])
     df["凡退率"] = 1 - df["出塁率"]
+    df["併殺打率"] = df["併殺"] / (df["打席数"] - df["犠打"])
 
-    return df
+    calc_df = df[["選手名", "凡退率","単打率","二塁打率","三塁打率","本塁打率","四死球率","盗塁成功率","犠打成功率", "併殺打率"]]
+    return calc_df
 
 print("###########")
 print("Central League")
 print("###########")
 
+# https://stackoverflow.com/questions/31247198/python-pandas-write-content-of-dataframe-into-text-file
 giants = data_generate(giants_url)
-giants.to_csv("data/giants.csv")
+giants.iloc[:9,1:].to_csv(r'data/giants.txt', header=None, index=None, sep=' ', mode='w')
 swallows = data_generate(swallows_url)
-swallows.to_csv("data/swallows.csv")
+swallows.iloc[:9,1:].to_csv(r'data/swallows.txt', header=None, index=None, sep=' ', mode='w')
 dena = data_generate(dena_url)
-dena.to_csv("data/dena.csv")
+dena.iloc[:9,1:].to_csv(r'data/dena.txt', header=None, index=None, sep=' ', mode='w')
 tigers = data_generate(tigers_url)
-tigers.to_csv("data/tigers.csv")
+tigers.iloc[:9,1:].to_csv(r'data/tigers.txt', header=None, index=None, sep=' ', mode='w')
 dragons = data_generate(dragons_url)
-dragons.to_csv("data/dragons.csv")
+dragons.iloc[:9,1:].to_csv(r'data/dragons.txt', header=None, index=None, sep=' ', mode='w')
 carp = data_generate(carp_url)
-carp.to_csv("data/carp.csv")
+carp.iloc[:9,1:].to_csv(r'data/carp.txt', header=None, index=None, sep=' ', mode='w')
 
 print("###########")
 print("Pacific League")
 print("###########")
 lions = data_generate(lions_url)
-lions.to_csv("data/lions.csv")
+lions.iloc[:9,1:].to_csv(r'data/lions.txt', header=None, index=None, sep=' ', mode='w')
 fighters = data_generate(fighters_url)
-fighters.to_csv("data/fighters.csv")
+fighters.iloc[:9,1:].to_csv(r'data/fighters.txt', header=None, index=None, sep=' ', mode='w')
 eagles = data_generate(eagles_url)
-eagles.to_csv("data/eagles.csv")
+eagles.iloc[:9,1:].to_csv(r'data/eagles.txt', header=None, index=None, sep=' ', mode='w')
 lotte = data_generate(lotte_url)
-lotte.to_csv("data/lotte.csv")
+lotte.iloc[:9,1:].to_csv(r'data/lotte.txt', header=None, index=None, sep=' ', mode='w')
 orix = data_generate(orix_url)
-orix.to_csv("data/orix.csv")
+orix.iloc[:9,1:].to_csv(r'data/orix.txt', header=None, index=None, sep=' ', mode='w')
 hawks = data_generate(hawks_url)
-hawks.to_csv("data/hawks.csv")
+hawks.iloc[:9,1:].to_csv(r'data/hawks.txt', header=None, index=None, sep=' ', mode='w')
+
+print("###########")
+print("FINISH")
+print("###########")
